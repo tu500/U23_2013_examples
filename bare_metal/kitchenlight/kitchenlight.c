@@ -76,7 +76,7 @@ void initialize_kitchenlight(void)
   init_spi();
 
   // Set first screen state
-  scr_st = (ScreenState) { 
+  scr_st = (ScreenState) {
     .config = &screenconfig_empty,
   };
   current_screen_state = &scr_st;

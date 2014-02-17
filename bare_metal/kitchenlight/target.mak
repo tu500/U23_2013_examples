@@ -6,7 +6,9 @@ CCSOURCES = main.c \
             shiftbrite.c \
             dma_spi.c \
 	    kitchenlight.c \
+	    pixelfont.c \
 	    screen_empty.c \
+	    screen_strobo.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/system_stm32f4xx.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/startup/startup_stm32f4xx.c \
             lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c \
