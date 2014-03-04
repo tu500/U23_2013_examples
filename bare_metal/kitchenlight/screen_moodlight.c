@@ -9,7 +9,7 @@ static void e_draw(void);
 
 ScreenConfig screenconfig_strobo =
 {
-  //.Init
+  .Init
   //.Deinit
   //.Update
   .Draw = e_draw,
@@ -19,16 +19,16 @@ ScreenConfig screenconfig_strobo =
   //.OnUnpause
 };
 
-static int counter = 0;
+static void e_init(void)
+{
+  if (!user_data) // TODO
+    user_data = malloc(sizeof(struct screen_moodlight_data));
+}
 
 static void e_draw(void)
 {
-  counter++;
-  counter %= counter_max;
-
   uint32_t* buffer = get_working_buffer();
-  uint16_t v = counter < counter_max/2 ? 1023 : 0;
-  uint32_t color = convert_color_rb(v, v, v);
+  uint32_t color = convert_color_rb(user_data->ch_red, user_data->ch_green, user_data->ch_blue);
   for (int i = 0; i < KITCHENLIGHT_BUFFER_SIZE; ++i)
   {
     buffer[i] = color;

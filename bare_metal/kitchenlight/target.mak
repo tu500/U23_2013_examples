@@ -9,6 +9,7 @@ CCSOURCES = main.c \
 	    pixelfont.c \
 	    screen_empty.c \
 	    screen_strobo.c \
+	    std_font.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/system_stm32f4xx.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/startup/startup_stm32f4xx.c \
             lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c \
@@ -57,3 +58,7 @@ SRCDIR = .
 DEFINES :=
 
 include $(ROOT)/build/targets/executable.mak
+
+$(SRCDIR)/std_font.c: CURDIR:=$(CURDIR)
+$(SRCDIR)/std_font.c: $(CURDIR)/font $(CURDIR)/conv_font.py
+	python $(CURDIR)/conv_font.py $< $@
