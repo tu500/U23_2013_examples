@@ -17,7 +17,7 @@ static uint32_t* volatile current_buffer = 0;
 
 static uint32_t data_buffer0[KITCHENLIGHT_BUFFER_SIZE] __attribute__ ((section (".sram.bss")));
 static uint32_t data_buffer1[KITCHENLIGHT_BUFFER_SIZE] __attribute__ ((section (".sram.bss")));
-static uint32_t reset_buffer[2] __attribute__ ((section (".sram.bss")));
+static uint32_t reset_buffer[6] __attribute__ ((section (".sram.bss")));
 
 static void assert(bool b);
 
@@ -144,8 +144,8 @@ static void start_next_dma_package(void)
     next_buffer = 0;
 
     // Start DMA
-    configure_dma((uint16_t*) current_buffer, KITCHENLIGHT_BUFFER_SIZE*2);
-    start_dma_spi(KITCHENLIGHT_BUFFER_SIZE*2);
+    configure_dma((uint16_t*) current_buffer, KITCHENLIGHT_BUFFER_SIZE*2/3);
+    start_dma_spi(KITCHENLIGHT_BUFFER_SIZE*2/3);
   }
 }
 
@@ -175,7 +175,7 @@ static void start_reset_package(void)
   configure_dma((uint16_t*) reset_buffer, 2*2);
   start_dma_spi(2*2);
 
-  if (reset_count++ >= KITCHENLIGHT_BUFFER_SIZE)
+  if (reset_count++ >= KITCHENLIGHT_BUFFER_SIZE/3)
   //if (reset_count >= 5)
   {
     resetting = false;
