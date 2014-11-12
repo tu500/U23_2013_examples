@@ -17,8 +17,16 @@ static uint32_t* volatile current_buffer = 0;
 
 static uint32_t data_buffer0[KITCHENLIGHT_BUFFER_SIZE] __attribute__ ((section (".sram.bss")));
 static uint32_t data_buffer1[KITCHENLIGHT_BUFFER_SIZE] __attribute__ ((section (".sram.bss")));
+static uint32_t reset_buffer[2] __attribute__ ((section (".sram.bss")));
 
 static void assert(bool b);
+
+static uint32_t frame_counter = 0;
+static uint32_t reset_count = 0;
+static bool resetting = false;
+static void init_reset_buffer(void);
+static void start_reset(void);
+static void start_reset_package(void);
 
 
 
@@ -75,6 +83,7 @@ void initialize_kitchenlight(void)
 {
   init_leds();
   init_spi();
+  init_reset_buffer();
 
   // Set first screen state
   scr_st = (ScreenState) {
@@ -100,6 +109,7 @@ void kitchenlight_loop(void)
 
   if(current_screen_state->config->Draw)
     current_screen_state->config->Draw();
+  start_reset();
 
   // screen state management
 
@@ -110,8 +120,16 @@ void kitchenlight_loop(void)
 // This callback is called after the latch done by the DMA interrupt
 void spi_dma_package_done(void)
 {
-  current_buffer = 0;
-  start_next_dma_package();
+  if (resetting)
+  {
+    start_reset_package();
+  }
+  else
+  {
+    current_buffer = 0;
+    frame_counter++;
+    start_next_dma_package();
+  }
 }
 
 
@@ -128,6 +146,39 @@ static void start_next_dma_package(void)
     // Start DMA
     configure_dma((uint16_t*) current_buffer, KITCHENLIGHT_BUFFER_SIZE*2);
     start_dma_spi(KITCHENLIGHT_BUFFER_SIZE*2);
+  }
+}
+
+
+// Initialize buffer for reset frames
+static void init_reset_buffer(void)
+{
+  uint32_t t = 0x40000000 | 1<<6 | 1<<16 | 1<<26;
+  t = (t<<16) | (t>>16); // byte order
+  for (int i = 0; i < 2; ++i)
+    reset_buffer[i] = t;
+}
+// Initiate a reset sequence
+static void start_reset(void)
+{
+  reset_count = 0;
+  resetting = true;
+
+  // don't do it here, it will automatically be queued after the current package
+  //start_reset_package();
+}
+// The start_next_dma_package equivalent for reset sequences
+static void start_reset_package(void)
+{
+  reset_count++;
+
+  configure_dma((uint16_t*) reset_buffer, 2*2);
+  start_dma_spi(2*2);
+
+  if (reset_count++ >= KITCHENLIGHT_BUFFER_SIZE)
+  //if (reset_count >= 5)
+  {
+    resetting = false;
   }
 }
 
