@@ -40,7 +40,8 @@ void init_spi(void)
   // SPI can only work with 8 and 16 bit data packets, we use 16 to minimize
   // interrupts. This means we have to split up uint32_t's (-> sentUpperWord).
   SPI_Init(SPI2, &(SPI_InitTypeDef){
-      .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16, // Configure Data speed
+      //.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16, // Configure Data speed
+      .SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256, // Configure Data speed
       .SPI_CPHA = SPI_CPHA_1Edge, // Sample data on rising edge
       .SPI_CPOL = SPI_CPOL_Low, // Clock is default low
       .SPI_CRCPolynomial = 1, // Don't use CRC
