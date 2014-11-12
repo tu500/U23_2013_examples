@@ -5,6 +5,7 @@
 #include "dma_spi.h"
 
 #include "screen_empty.h"
+#include "screen_checker.h"
 
 ScreenState* current_screen_state = 0;
 
@@ -77,7 +78,8 @@ void initialize_kitchenlight(void)
 
   // Set first screen state
   scr_st = (ScreenState) {
-    .config = &screenconfig_empty,
+    .config = &screenconfig_checker,
+    //.config = &screenconfig_empty,
   };
   current_screen_state = &scr_st;
 
