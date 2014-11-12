@@ -16,7 +16,7 @@ void init_spi(void)
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
-  RCC_APB1PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE);
 
@@ -158,7 +158,9 @@ void start_dma_spi(int data_count)
   // Reset Latch
   GPIO_WriteBit(GPIOB, GPIO_Pin_12, RESET);
 
-  spi_running[0] = spi_running[1] = spi_running[2] = true;
+  spi_running[0] = true;
+  spi_running[1] = true;
+  spi_running[2] = true;
 
   // Start DMA
   DMA_Cmd(DMA2_Stream5, ENABLE);
@@ -179,7 +181,7 @@ void configure_dma(uint16_t* buffer, int buffer_size)
       .DMA_Channel = DMA_Channel_3,
       .DMA_BufferSize = buffer_size,
       .DMA_DIR = DMA_DIR_MemoryToPeripheral,
-      .DMA_Memory0BaseAddr = (uint32_t)buffer,
+      .DMA_Memory0BaseAddr = (uint32_t)(buffer + 0*buffer_size),
       .DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord,
       .DMA_MemoryInc = DMA_MemoryInc_Enable,
       .DMA_Mode = DMA_Mode_Normal,
@@ -193,7 +195,7 @@ void configure_dma(uint16_t* buffer, int buffer_size)
       .DMA_Channel = DMA_Channel_0,
       .DMA_BufferSize = buffer_size,
       .DMA_DIR = DMA_DIR_MemoryToPeripheral,
-      .DMA_Memory0BaseAddr = (uint32_t)(buffer + buffer_size),
+      .DMA_Memory0BaseAddr = (uint32_t)(buffer + 1*buffer_size),
       .DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord,
       .DMA_MemoryInc = DMA_MemoryInc_Enable,
       .DMA_Mode = DMA_Mode_Normal,
@@ -211,7 +213,7 @@ void configure_dma(uint16_t* buffer, int buffer_size)
       .DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord,
       .DMA_MemoryInc = DMA_MemoryInc_Enable,
       .DMA_Mode = DMA_Mode_Normal,
-      .DMA_PeripheralBaseAddr = (uint32_t)&SPI2->DR,
+      .DMA_PeripheralBaseAddr = (uint32_t)&SPI3->DR,
       .DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord,
       .DMA_PeripheralInc = DMA_PeripheralInc_Disable,
       .DMA_Priority = DMA_Priority_High,
@@ -280,6 +282,9 @@ void SPI1_IRQHandler(void){
   if(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == SET){
     spi_running[0] = false;
     spi_handleSPI_TxeInterrupt();
+
+    // Disable the TXE interrupt
+    SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_TXE, DISABLE);
   }
 }
 
@@ -287,6 +292,7 @@ void SPI2_IRQHandler(void){
   if(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == SET){
     spi_running[1] = false;
     spi_handleSPI_TxeInterrupt();
+    SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_TXE, DISABLE);
   }
 }
 
@@ -294,6 +300,7 @@ void SPI3_IRQHandler(void){
   if(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE) == SET){
     spi_running[2] = false;
     spi_handleSPI_TxeInterrupt();
+    SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_TXE, DISABLE);
   }
 }
 
@@ -305,16 +312,15 @@ void spi_dma_package_done(void);
 // is shifting data bits out of its internal shift register. So wait until it is
 // done finally.
 static void spi_handleSPI_TxeInterrupt(void){
+  // Some SPI is still active
+  if (spi_running[0] || spi_running[1] || spi_running[2])
+    return;
+
   // Wait until the SPI is _really_ done
   while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_BSY) == SET
       || SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY) == SET
       || SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY) == SET)
     ;
-
-  // Disable the TXE interrupt
-  SPI_I2S_ITConfig(SPI1, SPI_I2S_IT_TXE, DISABLE);
-  SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_TXE, DISABLE);
-  SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_TXE, DISABLE);
 
   // Do a latch
   latch();

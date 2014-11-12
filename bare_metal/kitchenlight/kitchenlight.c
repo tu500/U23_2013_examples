@@ -155,7 +155,7 @@ static void init_reset_buffer(void)
 {
   uint32_t t = 0x40000000 | 1<<6 | 1<<16 | 1<<26;
   t = (t<<16) | (t>>16); // byte order
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < sizeof(reset_buffer)/sizeof(uint32_t); ++i)
     reset_buffer[i] = t;
 }
 // Initiate a reset sequence
