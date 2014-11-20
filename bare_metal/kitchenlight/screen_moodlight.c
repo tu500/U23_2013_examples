@@ -5,11 +5,12 @@
 static int counter_max = 300;
 
 
+static void e_init(void);
 static void e_draw(void);
 
 ScreenConfig screenconfig_strobo =
 {
-  .Init
+  .Init = e_init,
   //.Deinit
   //.Update
   .Draw = e_draw,

@@ -1,29 +1,35 @@
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "kitchenlight.h"
 #include "shiftbrite.h"
 #include "dma_spi.h"
 
-#include "screen_empty.h"
 #include "screen_checker.h"
+#include "screen_empty.h"
+#include "screen_matrix.h"
+#include "screen_random.h"
+#include "screen_strobo.h"
+#include "screen_text.h"
 
 ScreenState* current_screen_state = 0;
+ScreenConfig* next_screen_config = 0;
 
 //static ScreenConfig* next_screen_config;
 static bool exit_screen_state = false;
 
-static uint32_t* volatile next_buffer = 0;
-static uint32_t* volatile current_buffer = 0;
+static volatile uint32_t* next_buffer = 0;
+static volatile uint32_t* current_buffer = 0;
 
 static uint32_t data_buffer0[KITCHENLIGHT_BUFFER_SIZE] __attribute__ ((section (".sram.bss")));
 static uint32_t data_buffer1[KITCHENLIGHT_BUFFER_SIZE] __attribute__ ((section (".sram.bss")));
-static uint32_t reset_buffer[6] __attribute__ ((section (".sram.bss")));
+static uint32_t reset_buffer[KITCHENLIGHT_BUFFER_SIZE] __attribute__ ((section (".sram.bss")));
 
 static void assert(bool b);
 
-static uint32_t frame_counter = 0;
-static uint32_t reset_count = 0;
-static bool resetting = false;
+static volatile uint32_t frame_counter = 0;
+static volatile uint32_t reset_count = 0;
+static volatile bool resetting = false;
 static void init_reset_buffer(void);
 static void start_reset(void);
 static void start_reset_package(void);
@@ -60,10 +66,10 @@ void set_next_buffer_ro(uint32_t* buffer)
   next_buffer = b;
 }
 
-//int ChangeState(ScreenConfig *screen)
-//{
-//  next_screen_config = ...;
-//}
+void change_screen(ScreenConfig *sc)
+{
+  next_screen_config = sc;
+}
 
 void ExitState(void)
 {
@@ -87,7 +93,8 @@ void initialize_kitchenlight(void)
 
   // Set first screen state
   scr_st = (ScreenState) {
-    .config = &screenconfig_checker,
+    .config = &screenconfig_matrix,
+    //.config = &screenconfig_checker,
     //.config = &screenconfig_empty,
   };
   current_screen_state = &scr_st;
@@ -109,10 +116,23 @@ void kitchenlight_loop(void)
 
   if(current_screen_state->config->Draw)
     current_screen_state->config->Draw();
-  start_reset();
+
+  if (next_screen_config != NULL)
+  {
+    if (current_screen_state->config->Deinit)
+      current_screen_state->config->Deinit();
+
+    current_screen_state->user_data = NULL;
+    current_screen_state->config = next_screen_config;
+    next_screen_config = NULL;
+
+    if (current_screen_state->config->Init)
+      current_screen_state->config->Init();
+  }
 
   // screen state management
 
+  start_reset();
   start_next_dma_package();
 }
 
@@ -155,7 +175,7 @@ static void init_reset_buffer(void)
 {
   uint32_t t = 0x40000000 | 1<<6 | 1<<16 | 1<<26;
   t = (t<<16) | (t>>16); // byte order
-  for (int i = 0; i < sizeof(reset_buffer)/sizeof(uint32_t); ++i)
+  for (uint32_t i = 0; i < sizeof(reset_buffer)/sizeof(uint32_t); ++i)
     reset_buffer[i] = t;
 }
 // Initiate a reset sequence
@@ -170,15 +190,25 @@ static void start_reset(void)
 // The start_next_dma_package equivalent for reset sequences
 static void start_reset_package(void)
 {
-  reset_count++;
-
-  configure_dma((uint16_t*) reset_buffer, 2*2);
-  start_dma_spi(2*2);
-
-  if (reset_count++ >= KITCHENLIGHT_BUFFER_SIZE/3)
-  //if (reset_count >= 5)
+  if (reset_count++ == 0)
   {
-    resetting = false;
+    // The first step is to write a reset command to all LEDs so that the image
+    // won't shift through while doing the reset.
+
+    configure_dma((uint16_t*) reset_buffer, KITCHENLIGHT_BUFFER_SIZE/3*2);
+    start_dma_spi(KITCHENLIGHT_BUFFER_SIZE/3*2);
+
+    // Enabling this will mean half the reset time, but take several frames to
+    // reset all LEDs
+    //resetting = false;
+  }
+  else
+  {
+    configure_dma((uint16_t*) reset_buffer, 1*2);
+    start_dma_spi(1*2);
+
+    if (reset_count++ >= KITCHENLIGHT_BUFFER_SIZE/3)
+      resetting = false;
   }
 }
 
@@ -191,17 +221,17 @@ static void start_reset_package(void)
 // pixels from a y*x array to the output array as the DMA/SPI expects it.
 void copy_buffer_b2f(uint32_t* src, uint32_t* dst)
 {
-  for (int i=150; i<180; i++)
+  for (int i=30; i<60; i++)
     *(dst++) = src[i];
-  for (int i=149; i>=120; i--)
+  for (int i=29; i>=0; i--)
     *(dst++) = src[i];
   for (int i=90; i<120; i++)
     *(dst++) = src[i];
   for (int i=89; i>=60; i--)
     *(dst++) = src[i];
-  for (int i=30; i<60; i++)
+  for (int i=150; i<180; i++)
     *(dst++) = src[i];
-  for (int i=29; i>=0; i--)
+  for (int i=149; i>=120; i--)
     *(dst++) = src[i];
 }
 

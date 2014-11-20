@@ -39,7 +39,7 @@ extern ScreenState* current_screen_state;
 uint32_t* get_working_buffer(void);
 void set_next_buffer(uint32_t* buffer);
 void set_next_buffer_ro(uint32_t* buffer);
-int ChangeState(ScreenConfig *screen);
+void change_screen(ScreenConfig *sc);
 void ExitState(void);
 void copy_buffer_b2f(uint32_t* src, uint32_t* dst);
 

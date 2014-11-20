@@ -5,7 +5,7 @@
 #include "dma_spi.h"
 
 static uint32_t convenient_buffer __attribute__ ((section (".sram.bss")));
-static bool spi_running[3] = {false, false, false};
+static volatile bool spi_running[3] = {false, false, false};
 
 
 // Initialize SPI

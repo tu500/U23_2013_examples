@@ -1,5 +1,5 @@
-#ifndef STROBO_H_SRZMY68B
-#define STROBO_H_SRZMY68B
+#ifndef SCREEN_TEXT_H_LYSAHUAO
+#define SCREEN_TEXT_H_LYSAHUAO
 
 #include "kitchenlight.h"
 
@@ -12,4 +12,5 @@ struct screen_text_data
 };
 
 
-#endif /* end of include guard: SCREEN_EMPTY_H_3HIGBLBZ */
+#endif /* end of include guard: SCREEN_TEXT_H_LYSAHUAO */
+

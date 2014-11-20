@@ -11,7 +11,9 @@ CCSOURCES = main.c \
 	    screen_checker.c \
 	    screen_empty.c \
 	    screen_matrix.c \
+	    screen_random.c \
 	    screen_strobo.c \
+	    screen_text.c \
 	    std_font.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/system_stm32f4xx.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/startup/startup_stm32f4xx.c \

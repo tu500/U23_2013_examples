@@ -2,7 +2,7 @@
 #include "screen_strobo.h"
 
 
-static int counter_max = 300;
+static int counter_max = 2;
 
 
 static void e_draw(void);

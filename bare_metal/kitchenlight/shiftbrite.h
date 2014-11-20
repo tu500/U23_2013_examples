@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 // To view what happens while bitbanging exchange these two lines
-#define wait_latch 1000
+#define wait_latch 10
 //#define wait_latch 1000000
 
 uint32_t convert_color(uint32_t r, uint32_t g, uint32_t b);
