@@ -18,7 +18,7 @@ void render_char(char c, uint32_t* buffer, int xpos)
     for (int x = xpos < 0 ? -xpos : 0; x < width && xpos + x < 30; ++x)
     {
       uint16_t v = std_font.chars[(uint8_t)c].rows[y] & (1<<x) ? 1023 : 0;
-      buffer[y * 30 + (xpos + x)] = convert_color(v, v, v);
+      buffer[y * 30 + (xpos + x)] = convert_color_rb(0, v, 0);
     }
 }
 
@@ -31,7 +31,8 @@ void render_string(char const *c, uint32_t* buffer, int xpos)
     p += std_font.chars[(uint8_t)(*c)].width;
 
     // clear kerning
-    if (p < 30)
+    // TODO optimize this check? don't render for negative coordinates?
+    if (p >= 0 && p < 30)
       for (int y = 0; y < 6; ++y)
         buffer[y * 30 + p] = convert_color(0, 0, 0);
 
