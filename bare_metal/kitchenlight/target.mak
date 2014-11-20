@@ -7,8 +7,10 @@ CCSOURCES = main.c \
             dma_spi.c \
 	    kitchenlight.c \
 	    pixelfont.c \
+	    rng.c \
 	    screen_checker.c \
 	    screen_empty.c \
+	    screen_matrix.c \
 	    screen_strobo.c \
 	    std_font.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/system_stm32f4xx.c \
@@ -17,6 +19,7 @@ CCSOURCES = main.c \
             lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c \
             lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_spi.c \
             lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma.c \
+            lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rng.c \
             lib/STM32F4xx_StdPeriph_Driver/src/misc.c
 
 # List C++ source files here.
