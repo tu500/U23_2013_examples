@@ -11,6 +11,7 @@ CCSOURCES = main.c \
 	    screen_checker.c \
 	    screen_empty.c \
 	    screen_matrix.c \
+	    screen_pacman.c \
 	    screen_random.c \
 	    screen_strobo.c \
 	    screen_text.c \
