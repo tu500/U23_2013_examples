@@ -8,6 +8,7 @@
 #include "screen_checker.h"
 #include "screen_empty.h"
 #include "screen_matrix.h"
+#include "screen_pacman.h"
 #include "screen_random.h"
 #include "screen_strobo.h"
 #include "screen_text.h"
@@ -93,7 +94,7 @@ void initialize_kitchenlight(void)
 
   // Set first screen state
   scr_st = (ScreenState) {
-    .config = &screenconfig_matrix,
+    .config = &screenconfig_pacman,
     //.config = &screenconfig_checker,
     //.config = &screenconfig_empty,
   };
