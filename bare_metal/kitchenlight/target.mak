@@ -5,17 +5,18 @@ TARGET = kitchenlight
 CCSOURCES = main.c \
             shiftbrite.c \
             dma_spi.c \
-	    kitchenlight.c \
-	    pixelfont.c \
-	    rng.c \
-	    screen_checker.c \
-	    screen_empty.c \
-	    screen_matrix.c \
-	    screen_pacman.c \
-	    screen_random.c \
-	    screen_strobo.c \
-	    screen_text.c \
-	    std_font.c \
+            kitchenlight.c \
+            pixelfont.c \
+            rng.c \
+            screen_checker.c \
+            screen_empty.c \
+            screen_matrix.c \
+            screen_openchaos.c \
+            screen_pacman.c \
+            screen_random.c \
+            screen_strobo.c \
+            screen_text.c \
+            std_font.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/system_stm32f4xx.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/startup/startup_stm32f4xx.c \
             lib/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c \
