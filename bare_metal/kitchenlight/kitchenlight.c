@@ -5,13 +5,7 @@
 #include "shiftbrite.h"
 #include "dma_spi.h"
 
-#include "screen_checker.h"
-#include "screen_empty.h"
-#include "screen_matrix.h"
-#include "screen_pacman.h"
-#include "screen_random.h"
-#include "screen_strobo.h"
-#include "screen_text.h"
+#include "screens/screens.h"
 
 ScreenState* current_screen_state = 0;
 ScreenConfig* next_screen_config = 0;

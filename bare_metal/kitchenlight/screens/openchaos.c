@@ -2,7 +2,7 @@
 
 #include "shiftbrite.h"
 #include "pixelfont.h"
-#include "screen_openchaos.h"
+#include "screens/openchaos.h"
 
 
 static char const *strings[] = {

@@ -2,7 +2,7 @@
 
 #include "shiftbrite.h"
 #include "pixelfont.h"
-#include "screen_text.h"
+#include "screens/text.h"
 
 #define state_data ((struct screen_text_data*) current_screen_state->user_data)
 

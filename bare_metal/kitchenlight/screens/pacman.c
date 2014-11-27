@@ -1,5 +1,5 @@
 #include "shiftbrite.h"
-#include "screen_pacman.h"
+#include "screens/pacman.h"
 
 #define K 0
 #define R 0xfc00000f

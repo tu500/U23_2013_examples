@@ -1,5 +1,5 @@
 #include "shiftbrite.h"
-#include "screen_strobo.h"
+#include "screens/strobo.h"
 #include "rng.h"
 
 

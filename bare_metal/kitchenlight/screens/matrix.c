@@ -1,5 +1,5 @@
 #include "shiftbrite.h"
-#include "screen_matrix.h"
+#include "screens/matrix.h"
 #include "rng.h"
 
 

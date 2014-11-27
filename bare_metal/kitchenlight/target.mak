@@ -8,14 +8,14 @@ CCSOURCES = main.c \
             kitchenlight.c \
             pixelfont.c \
             rng.c \
-            screen_checker.c \
-            screen_empty.c \
-            screen_matrix.c \
-            screen_openchaos.c \
-            screen_pacman.c \
-            screen_random.c \
-            screen_strobo.c \
-            screen_text.c \
+            screens/checker.c \
+            screens/empty.c \
+            screens/matrix.c \
+            screens/openchaos.c \
+            screens/pacman.c \
+            screens/random.c \
+            screens/strobo.c \
+            screens/text.c \
             std_font.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/system_stm32f4xx.c \
             lib/CMSIS/DeviceSupport/ST/STM32F4xx/startup/startup_stm32f4xx.c \
